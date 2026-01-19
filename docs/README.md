@@ -1,4 +1,4 @@
-# Duke User Guide
+# Wacka User Guide
 
 // Update the title above to match the actual product name
 
