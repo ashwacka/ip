@@ -3,6 +3,12 @@ import java.util.*;
 
 public class Wacka {
 
+    public static class WackaException extends Exception {
+        public WackaException(String message) {
+            super(message);
+        }
+    }
+
     public static abstract class Task {
         protected String description;
         protected boolean isDone;
@@ -112,53 +118,65 @@ public class Wacka {
                 break;
             }
 
-            String[] words = input.split(" ");
-            //marking as complete
-            if (words[0].equals("mark")) {
-                String[] parts = input.split(" ");
-                int idx = Integer.parseInt(parts[1]) - 1;
-                arr[idx].markAsDone();
-                System.out.println(divider);
-                System.out.println("Good Job! I have marked this task as completed ⭐️");
-                System.out.println(arr[idx].getStatus() + " " + arr[idx].getDescription());
-                System.out.println(divider);
+            try {
+                String[] words = input.split(" ");
+                //marking as complete
+                if (words[0].equals("mark")) {
+                    String[] parts = input.split(" ");
+                    int idx = Integer.parseInt(parts[1]) - 1;
+                    arr[idx].markAsDone();
+                    System.out.println(divider);
+                    System.out.println("Good Job! I have marked this task as completed ⭐️");
+                    System.out.println(arr[idx].getStatus() + " " + arr[idx].getDescription());
+                    System.out.println(divider);
 
-            //unmarking a previously marked task
-            } else if (words[0].equals("unmark")) {
-                String[] parts = input.split(" ");
-                int idx = Integer.parseInt(parts[1]) - 1;
-                arr[idx].unMark();
-                System.out.println(divider);
-                System.out.println("Okay! I have marked this task as incomplete️");
-                System.out.println(arr[idx].getStatus() + " " + arr[idx].getDescription());
-                System.out.println(divider);
+                //unmarking a previously marked task
+                } else if (words[0].equals("unmark")) {
+                    String[] parts = input.split(" ");
+                    int idx = Integer.parseInt(parts[1]) - 1;
+                    arr[idx].unMark();
+                    System.out.println(divider);
+                    System.out.println("Okay! I have marked this task as incomplete️");
+                    System.out.println(arr[idx].getStatus() + " " + arr[idx].getDescription());
+                    System.out.println(divider);
 
-            //display list
-            } else if (words[0].equals("list")) {
-                System.out.println(divider);
-                System.out.println("Here are the tasks in your list:");
-                for (int j = 0; j < i; j++) {
-                    System.out.println((j + 1) + "." + arr[j]);
-                }
-                System.out.println(divider);
+                //display list
+                } else if (words[0].equals("list")) {
+                    System.out.println(divider);
+                    System.out.println("Here are the tasks in your list:");
+                    for (int j = 0; j < i; j++) {
+                        System.out.println((j + 1) + "." + arr[j]);
+                    }
+                    System.out.println(divider);
 
-            //filter based on the type of task
-            } else if (words[0].equals("todo")) {
-                String description = input.substring(5).trim();
-                arr[i] = new Todo(description);
-                i++;
-                System.out.println(divider);
-                System.out.println("Got it! I've added this task:");
-                System.out.println("  " + arr[i - 1]);
-                System.out.println("Now you have " + i + " tasks in the list.");
-                System.out.println(divider);
+                //filter based on the type of task
+                } else if (words[0].equals("todo")) {
+                    String description = input.substring(5).trim();
+                    if (description.isEmpty()) {
+                        throw new WackaException("Ohno! The description of a todo cannot be empty!");
+                    }
+                    arr[i] = new Todo(description);
+                    i++;
+                    System.out.println(divider);
+                    System.out.println("Got it! I've added this task:");
+                    System.out.println("  " + arr[i - 1]);
+                    System.out.println("Now you have " + i + " tasks in the list.");
+                    System.out.println(divider);
 
-            } else if (words[0].equals("deadline")) {
-                String rest = input.substring(9).trim();
-                String[] parts = rest.split(" /by ");
-                if (parts.length == 2) {
+                } else if (words[0].equals("deadline")) {
+                    String rest = input.substring(9).trim();
+                    String[] parts = rest.split(" /by ");
+                    if (parts.length != 2) {
+                        throw new WackaException("Ohno! The deadline cannot be empty!");
+                    }
                     String description = parts[0].trim();
                     String by = parts[1].trim();
+                    if (description.isEmpty()) {
+                        throw new WackaException("Ohno! Please describe the deadline!");
+                    }
+                    if (by.isEmpty()) {
+                        throw new WackaException("Ohno! When is this due?");
+                    }
                     arr[i] = new Deadline(description, by);
                     i++;
                     System.out.println(divider);
@@ -166,26 +184,43 @@ public class Wacka {
                     System.out.println("  " + arr[i - 1]);
                     System.out.println("Now you have " + i + " tasks in the list.");
                     System.out.println(divider);
-                }
 
-            } else if (words[0].equals("event")) {
-                String rest = input.substring(6).trim();
-                String[] parts = rest.split(" /from ");
-                if (parts.length == 2) {
+                } else if (words[0].equals("event")) {
+                    String rest = input.substring(6).trim();
+                    String[] parts = rest.split(" /from ");
+                    if (parts.length != 2) {
+                        throw new WackaException("Ohno! The event command format is incorrect. Use: event <description> /from <start> /to <end>");
+                    }
                     String description = parts[0].trim();
                     String[] timeParts = parts[1].split(" /to ");
-                    if (timeParts.length == 2) {
-                        String from = timeParts[0].trim();
-                        String to = timeParts[1].trim();
-                        arr[i] = new Event(description, from, to);
-                        i++;
-                        System.out.println(divider);
-                        System.out.println("Got it! I've added this task:");
-                        System.out.println("  " + arr[i - 1]);
-                        System.out.println("Now you have " + i + " tasks in the list.");
-                        System.out.println(divider);
+                    if (timeParts.length != 2) {
+                        throw new WackaException("Ohno! The event command format is incorrect. Use: event <description> /from <start> /to <end>");
                     }
+                    String from = timeParts[0].trim();
+                    String to = timeParts[1].trim();
+                    if (description.isEmpty()) {
+                        throw new WackaException("Ohno! The description of an event cannot be empty!");
+                    }
+                    if (from.isEmpty()) {
+                        throw new WackaException("Ohno! When does the event start?");
+                    }
+                    if (to.isEmpty()) {
+                        throw new WackaException("Ohno! When does the event end?");
+                    }
+                    arr[i] = new Event(description, from, to);
+                    i++;
+                    System.out.println(divider);
+                    System.out.println("Got it! I've added this task:");
+                    System.out.println("  " + arr[i - 1]);
+                    System.out.println("Now you have " + i + " tasks in the list.");
+                    System.out.println(divider);
+                } else {
+                    throw new WackaException("Oops! I do not know what to do with this :(");
                 }
+            } catch (WackaException e) {
+                System.out.println(divider);
+                System.out.println(e.getMessage());
+                System.out.println(divider);
             }
         }
         scanner.close();
