@@ -212,6 +212,24 @@ public class Wacka {
                     System.out.println("  " + arr[i - 1]);
                     System.out.println("Now you have " + i + " tasks in the list.");
                     System.out.println(divider);
+                } else if (words[0].equals("delete")) {
+                    int deleteIdx = Integer.parseInt(words[1]) - 1;
+                    if (deleteIdx < 0 || deleteIdx >= i) {
+                        throw new WackaException("Ohno! There's no task to delete!");
+                    }
+                    Task deletedTask = arr[deleteIdx];
+
+                    //shift all elements to the left
+                    for (int j = deleteIdx; j < i - 1; j++) {
+                        arr[j] = arr[j + 1];
+                    }
+                    arr[i - 1] = null;
+                    i--;
+                    System.out.println(divider);
+                    System.out.println("Okay! I've deleted this task: ");
+                    System.out.println(deletedTask.toString());
+                    System.out.println("Now you have " + i + " tasks in the list.");
+                    System.out.println(divider);
                 } else {
                     throw new WackaException("Oops! I do not know what to do with this :(");
                 }
