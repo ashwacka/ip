@@ -99,8 +99,7 @@ public class Wacka {
 
     public static void main(String[] args) {
         String divider = "____________________________________________________________";
-        System.out.println(divider);
-        System.out.println("Hello I'm Wacka!");
+        System.out.println("Hello! I'm Wacka");
         System.out.println("What can I do for you?");
         System.out.println(divider);
 
@@ -112,7 +111,6 @@ public class Wacka {
             String input = scanner.nextLine();
             //base case, terminating factor
             if (input.equals("bye")) {
-                System.out.println(divider);
                 System.out.println("Bye. Hope to see you again soon!");
                 System.out.println(divider);
                 break;

@@ -20,11 +20,12 @@ then
 fi
 
 # run the program, feed commands from input.txt file and redirect the output to the ACTUAL.TXT
-java -classpath ../bin Duke < input.txt > ACTUAL.TXT
+java -classpath ../bin Wacka < input.txt > ACTUAL.TXT
 
 # convert to UNIX format
 cp EXPECTED.TXT EXPECTED-UNIX.TXT
-dos2unix ACTUAL.TXT EXPECTED-UNIX.TXT
+tr -d '\r' < ACTUAL.TXT > ACTUAL-UNIX.TXT && mv ACTUAL-UNIX.TXT ACTUAL.TXT
+tr -d '\r' < EXPECTED-UNIX.TXT > EXPECTED-UNIX-CLEAN.TXT && mv EXPECTED-UNIX-CLEAN.TXT EXPECTED-UNIX.TXT
 
 # compare the output to the expected output
 diff ACTUAL.TXT EXPECTED-UNIX.TXT
