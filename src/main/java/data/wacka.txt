@@ -1,0 +1,4 @@
+T | 0 | read book
+T | 0 | wash hair
+T | 0 | this
+T | 0 | that
