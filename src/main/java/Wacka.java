@@ -5,6 +5,9 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Wacka {
 
@@ -75,9 +78,9 @@ public class Wacka {
     }
 
     public static class Deadline extends Task {
-        private String by;
+        private LocalDate by;
 
-        public Deadline(String description, String by) {
+        public Deadline(String description, LocalDate by) {
             super(description);
             this.by = by;
         }
@@ -87,26 +90,27 @@ public class Wacka {
             return "D";
         }
 
-        public String getBy() {
+        public LocalDate getBy() {
             return by;
         }
 
         @Override
         public String toString() {
-            return "[" + getType() + "]" + getStatus() + " " + getDescription() + " (by: " + by + ")";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy");
+            return "[" + getType() + "]" + getStatus() + " " + getDescription() + " (by: " + by.format(formatter) + ")";
         }
 
         @Override
         public String toFileFormat() {
-            return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by;
+            return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by.toString();
         }
     }
 
     public static class Event extends Task {
-        private String from;
-        private String to;
+        private LocalDate from;
+        private LocalDate to;
 
-        public Event(String description, String from, String to) {
+        public Event(String description, LocalDate from, LocalDate to) {
             super(description);
             this.from = from;
             this.to = to;
@@ -117,22 +121,23 @@ public class Wacka {
             return "E";
         }
 
-        public String getFrom() {
+        public LocalDate getFrom() {
             return from;
         }
 
-        public String getTo() {
+        public LocalDate getTo() {
             return to;
         }
 
         @Override
         public String toString() {
-            return "[" + getType() + "]" + getStatus() + " " + getDescription() + " (from: " + from + " to: " + to + ")";
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy");
+            return "[" + getType() + "]" + getStatus() + " " + getDescription() + " (from: " + from.format(formatter) + " to: " + to.format(formatter) + ")";
         }
 
         @Override
         public String toFileFormat() {
-            return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from + " | " + to;
+            return "E | " + (isDone ? "1" : "0") + " | " + description + " | " + from.toString() + " | " + to.toString();
         }
     }
 
@@ -157,13 +162,24 @@ public class Wacka {
                     if (parts.length < 4) {
                         throw new WackaException("Invalid deadline format in file");
                     }
-                    task = new Deadline(description, parts[3].trim());
+                    try {
+                        LocalDate byDate = LocalDate.parse(parts[3].trim());
+                        task = new Deadline(description, byDate);
+                    } catch (DateTimeParseException e) {
+                        throw new WackaException("Invalid date format in file: " + parts[3]);
+                    }
                     break;
                 case "E":
                     if (parts.length < 5) {
                         throw new WackaException("Invalid event format in file");
                     }
-                    task = new Event(description, parts[3].trim(), parts[4].trim());
+                    try {
+                        LocalDate fromDate = LocalDate.parse(parts[3].trim());
+                        LocalDate toDate = LocalDate.parse(parts[4].trim());
+                        task = new Event(description, fromDate, toDate);
+                    } catch (DateTimeParseException e) {
+                        throw new WackaException("Invalid date format in file");
+                    }
                     break;
                 default:
                     throw new WackaException("Unknown task type in file: " + type);
@@ -306,21 +322,26 @@ public class Wacka {
                         throw new WackaException("Ohno! The deadline cannot be empty!");
                     }
                     String description = parts[0].trim();
-                    String by = parts[1].trim();
+                    String byString = parts[1].trim();
                     if (description.isEmpty()) {
                         throw new WackaException("Ohno! Please describe the deadline!");
                     }
-                    if (by.isEmpty()) {
+                    if (byString.isEmpty()) {
                         throw new WackaException("Ohno! When is this due?");
                     }
-                    arr[i] = new Deadline(description, by);
-                    i++;
-                    saveTasks(arr, i, filePath);
-                    System.out.println(divider);
-                    System.out.println("Got it! I've added this task:");
-                    System.out.println("  " + arr[i - 1]);
-                    System.out.println("Now you have " + i + " tasks in the list.");
-                    System.out.println(divider);
+                    try {
+                        LocalDate byDate = LocalDate.parse(byString);
+                        arr[i] = new Deadline(description, byDate);
+                        i++;
+                        saveTasks(arr, i, filePath);
+                        System.out.println(divider);
+                        System.out.println("Got it! I've added this task:");
+                        System.out.println("  " + arr[i - 1]);
+                        System.out.println("Now you have " + i + " tasks in the list.");
+                        System.out.println(divider);
+                    } catch (DateTimeParseException e) {
+                        throw new WackaException("Ohno! Please use yyyy-mm-dd format for dates (e.g., 2019-12-02)");
+                    }
 
                 } else if (words[0].equals("event")) {
                     String rest = input.substring(6).trim();
@@ -333,25 +354,31 @@ public class Wacka {
                     if (timeParts.length != 2) {
                         throw new WackaException("Ohno! The event command format is incorrect. Use: event <description> /from <start> /to <end>");
                     }
-                    String from = timeParts[0].trim();
-                    String to = timeParts[1].trim();
+                    String fromString = timeParts[0].trim();
+                    String toString = timeParts[1].trim();
                     if (description.isEmpty()) {
                         throw new WackaException("Ohno! The description of an event cannot be empty!");
                     }
-                    if (from.isEmpty()) {
+                    if (fromString.isEmpty()) {
                         throw new WackaException("Ohno! When does the event start?");
                     }
-                    if (to.isEmpty()) {
+                    if (toString.isEmpty()) {
                         throw new WackaException("Ohno! When does the event end?");
                     }
-                    arr[i] = new Event(description, from, to);
-                    i++;
-                    saveTasks(arr, i, filePath);
-                    System.out.println(divider);
-                    System.out.println("Got it! I've added this task:");
-                    System.out.println("  " + arr[i - 1]);
-                    System.out.println("Now you have " + i + " tasks in the list.");
-                    System.out.println(divider);
+                    try {
+                        LocalDate fromDate = LocalDate.parse(fromString);
+                        LocalDate toDate = LocalDate.parse(toString);
+                        arr[i] = new Event(description, fromDate, toDate);
+                        i++;
+                        saveTasks(arr, i, filePath);
+                        System.out.println(divider);
+                        System.out.println("Got it! I've added this task:");
+                        System.out.println("  " + arr[i - 1]);
+                        System.out.println("Now you have " + i + " tasks in the list.");
+                        System.out.println(divider);
+                    } catch (DateTimeParseException e) {
+                        throw new WackaException("Ohno! Please use yyyy-mm-dd format for dates (e.g., 2019-12-02)");
+                    }
                 } else if (words[0].equals("delete")) {
                     int deleteIdx = Integer.parseInt(words[1]) - 1;
                     if (deleteIdx < 0 || deleteIdx >= i) {
