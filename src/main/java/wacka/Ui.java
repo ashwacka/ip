@@ -1,3 +1,5 @@
+package wacka;
+
 public class Ui {
     private static final String DIVIDER = "____________________________________________________________";
 
