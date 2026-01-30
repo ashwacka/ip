@@ -1,15 +1,11 @@
 import java.util.Scanner;
-import java.util.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 
 public class Wacka {
+    private Storage storage;
+    private TaskList tasks;
+    private Ui ui;
 
     public static class WackaException extends Exception {
         public WackaException(String message) {
@@ -141,272 +137,111 @@ public class Wacka {
         }
     }
 
-    //convert task from file to proper list format
-    private static Task parseTaskFromFile(String line) throws WackaException {
+    public Wacka(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
         try {
-            String[] parts = line.split(" \\| ");
-            if (parts.length < 3) {
-                throw new WackaException("Invalid task format in file");
-            }
-
-            String type = parts[0];
-            boolean isDone = parts[1].equals("1");
-            String description = parts[2];
-
-            Task task;
-            switch (type) {
-                case "T":
-                    task = new Todo(description);
-                    break;
-                case "D":
-                    if (parts.length < 4) {
-                        throw new WackaException("Invalid deadline format in file");
-                    }
-                    try {
-                        LocalDate byDate = LocalDate.parse(parts[3].trim());
-                        task = new Deadline(description, byDate);
-                    } catch (DateTimeParseException e) {
-                        throw new WackaException("Invalid date format in file: " + parts[3]);
-                    }
-                    break;
-                case "E":
-                    if (parts.length < 5) {
-                        throw new WackaException("Invalid event format in file");
-                    }
-                    try {
-                        LocalDate fromDate = LocalDate.parse(parts[3].trim());
-                        LocalDate toDate = LocalDate.parse(parts[4].trim());
-                        task = new Event(description, fromDate, toDate);
-                    } catch (DateTimeParseException e) {
-                        throw new WackaException("Invalid date format in file");
-                    }
-                    break;
-                default:
-                    throw new WackaException("Unknown task type in file: " + type);
-            }
-
-            if (isDone) {
-                task.markAsDone();
-            }
-            return task;
-        } catch (Exception e) {
-            throw new WackaException("Error parsing task from file: " + e.getMessage());
+            tasks = new TaskList(storage.load());
+        } catch (WackaException e) {
+            ui.showLoadingError();
+            tasks = new TaskList();
         }
     }
 
-    // Save tasks to file
-    private static void saveTasks(Task[] tasks, int count, String filePath) {
-        try {
-            File file = new File(filePath);
-            File parentDir = file.getParentFile();
-
-            if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
-            }
-
-            FileWriter writer = new FileWriter(file);
-            for (int i = 0; i < count; i++) {
-                writer.write(tasks[i].toFileFormat() + System.lineSeparator());
-            }
-            writer.close();
-        } catch (IOException e) {
-        }
-    }
-
-    // Load tasks from file
-    private static int loadTasks(Task[] tasks, String filePath) {
-        try {
-            File file = new File(filePath);
-            
-            // If file doesn't exist, return 0
-            if (!file.exists()) {
-                return 0;
-            }
-
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            int count = 0;
-
-            while ((line = reader.readLine()) != null && count < tasks.length) {
-                line = line.trim();
-                if (line.isEmpty()) {
-                    continue;
-                }
-                try {
-                    tasks[count] = parseTaskFromFile(line);
-                    count++;
-                } catch (WackaException e) {
-                }
-            }
-            reader.close();
-            return count;
-        } catch (IOException e) {
-            return 0;
-        }
-    }
-
-    public static void main(String[] args) {
-        String divider = "____________________________________________________________";
-        System.out.println("Hello! I'm Wacka");
-        System.out.println("What can I do for you?");
-        System.out.println(divider);
-
-        String filePath = "data" + File.separator + "wacka.txt";
-        
+    public void run() {
+        ui.printWelcome();
         Scanner scanner = new Scanner(System.in);
-        Task[] arr = new Task[100];
-        int i = loadTasks(arr, filePath);
-        
+
         while (scanner.hasNext()) {
             String input = scanner.nextLine();
-            //base case, terminating factor
-            if (input.equals("bye")) {
-                System.out.println(divider);
-                System.out.println("Bye. Hope to see you again soon!");
-                System.out.println(divider);
-                break;
-            }
 
             try {
-                String[] words = input.split(" ");
-                //marking as complete
-                if (words[0].equals("mark")) {
-                    String[] parts = input.split(" ");
-                    int idx = Integer.parseInt(parts[1]) - 1;
-                    arr[idx].markAsDone();
-                    saveTasks(arr, i, filePath);
-                    System.out.println(divider);
-                    System.out.println("Good Job! I have marked this task as completed ⭐️");
-                    System.out.println(arr[idx].getStatus() + " " + arr[idx].getDescription());
-                    System.out.println(divider);
+                Parser.Command command = Parser.parse(input);
 
-                //unmarking a previously marked task
-                } else if (words[0].equals("unmark")) {
-                    String[] parts = input.split(" ");
-                    int idx = Integer.parseInt(parts[1]) - 1;
-                    arr[idx].unMark();
-                    saveTasks(arr, i, filePath);
-                    System.out.println(divider);
-                    System.out.println("Okay! I have marked this task as incomplete️");
-                    System.out.println(arr[idx].getStatus() + " " + arr[idx].getDescription());
-                    System.out.println(divider);
+                switch (command.type) {
+                    case BYE:
+                        ui.printGoodbye();
+                        scanner.close();
+                        return;
 
-                //display list
-                } else if (words[0].equals("list")) {
-                    System.out.println(divider);
-                    System.out.println("Here are the tasks in your list:");
-                    for (int j = 0; j < i; j++) {
-                        System.out.println((j + 1) + "." + arr[j]);
-                    }
-                    System.out.println(divider);
+                    case LIST:
+                        ui.showTaskList(tasks.getTasks(), tasks.getCount());
+                        break;
 
-                //filter based on the type of task
-                } else if (words[0].equals("todo")) {
-                    String description = input.substring(5).trim();
-                    if (description.isEmpty()) {
-                        throw new WackaException("Ohno! The description of a todo cannot be empty!");
-                    }
-                    arr[i] = new Todo(description);
-                    i++;
-                    saveTasks(arr, i, filePath);
-                    System.out.println(divider);
-                    System.out.println("Got it! I've added this task:");
-                    System.out.println("  " + arr[i - 1]);
-                    System.out.println("Now you have " + i + " tasks in the list.");
-                    System.out.println(divider);
+                    case MARK:
+                        tasks.markTask(command.index);
+                        try {
+                            storage.save(tasks.getTasks());
+                        } catch (WackaException e) {
+                            ui.showError("Error saving tasks");
+                        }
+                        Task markedTask = tasks.getTask(command.index);
+                        ui.showMarkedTask(markedTask.getStatus(), markedTask.getDescription());
+                        break;
 
-                } else if (words[0].equals("deadline")) {
-                    String rest = input.substring(9).trim();
-                    String[] parts = rest.split(" /by ");
-                    if (parts.length != 2) {
-                        throw new WackaException("Ohno! The deadline cannot be empty!");
-                    }
-                    String description = parts[0].trim();
-                    String byString = parts[1].trim();
-                    if (description.isEmpty()) {
-                        throw new WackaException("Ohno! Please describe the deadline!");
-                    }
-                    if (byString.isEmpty()) {
-                        throw new WackaException("Ohno! When is this due?");
-                    }
-                    try {
-                        LocalDate byDate = LocalDate.parse(byString);
-                        arr[i] = new Deadline(description, byDate);
-                        i++;
-                        saveTasks(arr, i, filePath);
-                        System.out.println(divider);
-                        System.out.println("Got it! I've added this task:");
-                        System.out.println("  " + arr[i - 1]);
-                        System.out.println("Now you have " + i + " tasks in the list.");
-                        System.out.println(divider);
-                    } catch (DateTimeParseException e) {
-                        throw new WackaException("Ohno! Please use yyyy-mm-dd format for dates (e.g., 2019-12-02)");
-                    }
+                    case UNMARK:
+                        tasks.unmarkTask(command.index);
+                        try {
+                            storage.save(tasks.getTasks());
+                        } catch (WackaException e) {
+                            ui.showError("Error saving tasks");
+                        }
+                        Task unmarkedTask = tasks.getTask(command.index);
+                        ui.showUnmarkedTask(unmarkedTask.getStatus(), unmarkedTask.getDescription());
+                        break;
 
-                } else if (words[0].equals("event")) {
-                    String rest = input.substring(6).trim();
-                    String[] parts = rest.split(" /from ");
-                    if (parts.length != 2) {
-                        throw new WackaException("Ohno! The event command format is incorrect. Use: event <description> /from <start> /to <end>");
-                    }
-                    String description = parts[0].trim();
-                    String[] timeParts = parts[1].split(" /to ");
-                    if (timeParts.length != 2) {
-                        throw new WackaException("Ohno! The event command format is incorrect. Use: event <description> /from <start> /to <end>");
-                    }
-                    String fromString = timeParts[0].trim();
-                    String toString = timeParts[1].trim();
-                    if (description.isEmpty()) {
-                        throw new WackaException("Ohno! The description of an event cannot be empty!");
-                    }
-                    if (fromString.isEmpty()) {
-                        throw new WackaException("Ohno! When does the event start?");
-                    }
-                    if (toString.isEmpty()) {
-                        throw new WackaException("Ohno! When does the event end?");
-                    }
-                    try {
-                        LocalDate fromDate = LocalDate.parse(fromString);
-                        LocalDate toDate = LocalDate.parse(toString);
-                        arr[i] = new Event(description, fromDate, toDate);
-                        i++;
-                        saveTasks(arr, i, filePath);
-                        System.out.println(divider);
-                        System.out.println("Got it! I've added this task:");
-                        System.out.println("  " + arr[i - 1]);
-                        System.out.println("Now you have " + i + " tasks in the list.");
-                        System.out.println(divider);
-                    } catch (DateTimeParseException e) {
-                        throw new WackaException("Ohno! Please use yyyy-mm-dd format for dates (e.g., 2019-12-02)");
-                    }
-                } else if (words[0].equals("delete")) {
-                    int deleteIdx = Integer.parseInt(words[1]) - 1;
-                    if (deleteIdx < 0 || deleteIdx >= i) {
-                        throw new WackaException("Ohno! There's no task to delete!");
-                    }
-                    Task deletedTask = arr[deleteIdx];
+                    case TODO:
+                        Task todo = new Todo(command.description);
+                        tasks.addTask(todo);
+                        try {
+                            storage.save(tasks.getTasks());
+                        } catch (WackaException e) {
+                            ui.showError("Error saving tasks");
+                        }
+                        ui.showTaskAdded(todo, tasks.getCount());
+                        break;
 
-                    //shift all elements to the left
-                    for (int j = deleteIdx; j < i - 1; j++) {
-                        arr[j] = arr[j + 1];
-                    }
-                    arr[i - 1] = null;
-                    i--;
-                    saveTasks(arr, i, filePath);
-                    System.out.println(divider);
-                    System.out.println("Okay! I've deleted this task: ");
-                    System.out.println(deletedTask.toString());
-                    System.out.println("Now you have " + i + " tasks in the list.");
-                    System.out.println(divider);
-                } else {
-                    throw new WackaException("Oops! I do not know what to do with this :(");
+                    case DEADLINE:
+                        Task deadline = new Deadline(command.description, command.date);
+                        tasks.addTask(deadline);
+                        try {
+                            storage.save(tasks.getTasks());
+                        } catch (WackaException e) {
+                            ui.showError("Error saving tasks");
+                        }
+                        ui.showTaskAdded(deadline, tasks.getCount());
+                        break;
+
+                    case EVENT:
+                        Task event = new Event(command.description, command.date, command.toDate);
+                        tasks.addTask(event);
+                        try {
+                            storage.save(tasks.getTasks());
+                        } catch (WackaException e) {
+                            ui.showError("Error saving tasks");
+                        }
+                        ui.showTaskAdded(event, tasks.getCount());
+                        break;
+
+                    case DELETE:
+                        Task deletedTask = tasks.deleteTask(command.index);
+                        try {
+                            storage.save(tasks.getTasks());
+                        } catch (WackaException e) {
+                            ui.showError("Error saving tasks");
+                        }
+                        ui.showTaskDeleted(deletedTask, tasks.getCount());
+                        break;
                 }
             } catch (WackaException e) {
-                System.out.println(divider);
-                System.out.println(e.getMessage());
-                System.out.println(divider);
+                ui.showError(e.getMessage());
             }
         }
         scanner.close();
+    }
+
+    public static void main(String[] args) {
+        String filePath = "data" + java.io.File.separator + "wacka.txt";
+        new Wacka(filePath).run();
     }
 }
