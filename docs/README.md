@@ -1,4 +1,4 @@
-# Wacka User Guide
+# wacka.Wacka User Guide
 
 // Update the title above to match the actual product name
 

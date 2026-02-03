@@ -1,4 +1,5 @@
 T | 0 | read book
-T | 0 | wash hair
-T | 0 | this
+T | 1 | this
 T | 0 | that
+D | 0 | dowork | 2005-05-27
+T | 0 | read book
