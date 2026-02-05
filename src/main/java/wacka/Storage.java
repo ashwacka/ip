@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Class for Storage functionality.
+ * Loads and saves tasks to/from files.
+ */
 public class Storage {
     private String filePath;
 
@@ -15,6 +19,9 @@ public class Storage {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from data
+     */
     public Wacka.Task[] load() throws Wacka.WackaException {
         Wacka.Task[] tasks = new Wacka.Task[100];
         int count = 0;

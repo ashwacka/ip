@@ -1,5 +1,9 @@
 package wacka;
 
+/**
+ * Class for handling all actions related to a Task in the List
+ */
+
 public class TaskList {
     private Wacka.Task[] tasks;
     private int count;
@@ -28,6 +32,11 @@ public class TaskList {
             count++;
         }
     }
+
+    /**
+     * Deletes specified task from the list
+     * Shifts all the tasks after the deleted task to their new position
+     */
 
     public Wacka.Task deleteTask(int index) throws Wacka.WackaException {
         if (index < 0 || index >= count) {
