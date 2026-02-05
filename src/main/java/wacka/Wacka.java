@@ -15,6 +15,8 @@ public class Wacka {
         }
     }
 
+
+
     public static abstract class Task {
         protected String description;
         protected boolean isDone;
@@ -150,6 +152,9 @@ public class Wacka {
         }
     }
 
+    /**
+     * Runs the program based on the input commands given
+     */
     public void run() {
         ui.printWelcome();
         Scanner scanner = new Scanner(System.in);

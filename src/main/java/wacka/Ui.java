@@ -3,6 +3,9 @@ package wacka;
 public class Ui {
     private static final String DIVIDER = "____________________________________________________________";
 
+    /**
+     * Prints the default welcome
+     */
     public void printWelcome() {
         System.out.println("Hello! I'm Wacka");
         System.out.println("What can I do for you?");

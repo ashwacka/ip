@@ -3,6 +3,11 @@ package wacka;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Parses the input given by the user
+ * Checks for valid and invalid inputs, throws exception
+ */
+
 public class Parser {
     public static Command parse(String input) throws Wacka.WackaException {
         String[] words = input.split(" ");
