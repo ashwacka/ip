@@ -81,6 +81,24 @@ public class TaskList {
         return result;
     }
 
+    /**
+     * Returns tasks whose description contains the given keyword (case-insensitive).
+     */
+    public Wacka.Task[] findTasks(String keyword) {
+        Wacka.Task[] temp = new Wacka.Task[count];
+        int matchCount = 0;
+        String lowerKeyword = keyword.toLowerCase();
+        for (int i = 0; i < count; i++) {
+            if (tasks[i].getDescription().toLowerCase().contains(lowerKeyword)) {
+                temp[matchCount] = tasks[i];
+                matchCount++;
+            }
+        }
+        Wacka.Task[] result = new Wacka.Task[matchCount];
+        System.arraycopy(temp, 0, result, 0, matchCount);
+        return result;
+    }
+
     public int getCount() {
         return count;
     }

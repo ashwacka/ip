@@ -39,6 +39,16 @@ public class Parser {
             case "list":
                 return new Command(CommandType.LIST, -1, null, null, null);
 
+            case "find":
+                if (words.length < 2) {
+                    throw new Wacka.WackaException("Ohno! Please specify a keyword to search for!");
+                }
+                String keyword = input.substring(5).trim();
+                if (keyword.isEmpty()) {
+                    throw new Wacka.WackaException("Ohno! Please specify a keyword to search for!");
+                }
+                return new Command(CommandType.FIND, -1, keyword, null, null);
+
             case "todo":
                 String todoDescription = input.substring(5).trim();
                 if (todoDescription.isEmpty()) {
@@ -133,6 +143,6 @@ public class Parser {
     }
 
     public enum CommandType {
-        MARK, UNMARK, LIST, TODO, DEADLINE, EVENT, DELETE, BYE
+        MARK, UNMARK, LIST, FIND, TODO, DEADLINE, EVENT, DELETE, BYE
     }
 }

@@ -47,6 +47,22 @@ public class Ui {
         System.out.println(DIVIDER);
     }
 
+    public void showMatchingTasks(Wacka.Task[] tasks, int count) {
+        boolean isEmpty = (tasks == null || tasks.length == 0 || count <= 0);
+        if (isEmpty) {
+            System.out.println(DIVIDER);
+            System.out.println("No matching tasks found.");
+            System.out.println(DIVIDER);
+            return;
+        }
+        System.out.println(DIVIDER);
+        System.out.println("Here are the matching tasks in your list:");
+        for (int i = 0; i < count; i++) {
+            System.out.println((i + 1) + "." + tasks[i]);
+        }
+        System.out.println(DIVIDER);
+    }
+
     public void showTaskAdded(Wacka.Task task, int totalTasks) {
         System.out.println(DIVIDER);
         System.out.println("Got it! I've added this task:");

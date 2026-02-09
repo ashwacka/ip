@@ -175,6 +175,11 @@ public class Wacka {
                         ui.showTaskList(tasks.getTasks(), tasks.getCount());
                         break;
 
+                    case FIND:
+                        Wacka.Task[] matchingTasks = tasks.findTasks(command.description);
+                        ui.showMatchingTasks(matchingTasks, matchingTasks.length);
+                        break;
+
                     case MARK:
                         tasks.markTask(command.index);
                         try {
