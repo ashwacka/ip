@@ -6,8 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -23,9 +21,11 @@ public class Main extends Application {
     private Scene scene;
     private Image userImage;
     private Image botImage;
+    private Wacka wacka;
 
     public Main(String filePath) {
         this.filePath = filePath;
+        this.wacka = new Wacka(filePath);
     }
 
     public Main() {
@@ -41,10 +41,16 @@ public class Main extends Application {
         userInput = new TextField();
         sendButton = new Button("Send");
 
-        userImage = loadImageOrPlaceholder("/images/UserImage.jpg");
-        botImage = loadImageOrPlaceholder("/images/WackaImage.png");
-        DialogBox dialogBox = new DialogBox("Hello! I am Wacka.", botImage);
-        dialogContainer.getChildren().add(dialogBox);
+        userImage = new Image(this.getClass().getResourceAsStream("/images/WackaImage.png"));
+        botImage = new Image(this.getClass().getResourceAsStream("/images/UserImage.jpg"));
+
+        //Handling user input
+        sendButton.setOnMouseClicked((event) -> {
+            handleUserInput();
+        });
+        userInput.setOnAction((event) -> {
+            handleUserInput();
+        });
 
         AnchorPane mainLayout = new AnchorPane();
         mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
@@ -64,6 +70,9 @@ public class Main extends Application {
         scrollPane.setVvalue(1.0);
         scrollPane.setFitToWidth(true);
 
+        //Scroll down to the end every time dialogContainer's height changes.
+        dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
+
         dialogContainer.setPrefHeight(Region.USE_COMPUTED_SIZE);
 
         userInput.setPrefWidth(325.0);
@@ -79,20 +88,17 @@ public class Main extends Application {
         stage.show();
     }
 
-    private Image loadImageOrPlaceholder(String resourcePath) {
-        java.io.InputStream stream = getClass().getResourceAsStream(resourcePath);
-        if (stream != null) {
-            return new Image(stream);
-        }
-        // Create a visible colored placeholder image
-        WritableImage placeholder = new WritableImage(100, 100);
-        var pixelWriter = placeholder.getPixelWriter();
-        // Fill with a light gray color so it's visible
-        for (int x = 0; x < 100; x++) {
-            for (int y = 0; y < 100; y++) {
-                pixelWriter.setColor(x, y, Color.LIGHTGRAY);
-            }
-        }
-        return placeholder;
+    /**
+     * Creates a dialog box containing user input, and appends it to
+     * the dialog container. Clears the user input after processing.
+     */
+    private void handleUserInput() {
+        String userText = userInput.getText();
+        String dukeText = wacka.getResponse(userInput.getText());
+        dialogContainer.getChildren().addAll(
+                DialogBox.getUserDialog(userText, userImage),
+                DialogBox.getWackaDialog(dukeText, botImage)
+        );
+        userInput.clear();
     }
 }

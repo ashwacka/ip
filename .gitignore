@@ -8,6 +8,9 @@
 /build/
 src/main/resources/docs/
 
+# Class files
+src/main/java/wacka/.class
+
 # MacOS custom attributes files created by Finder
 .DS_Store
 *.iml

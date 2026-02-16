@@ -16,7 +16,6 @@ public class Wacka {
     }
 
 
-
     public static abstract class Task {
         protected String description;
         protected boolean isDone;
@@ -51,7 +50,7 @@ public class Wacka {
         }
 
         public abstract String getType();
-        
+
         // convert task to given format, e.g. T | 1 | read book
         public abstract String toFileFormat();
 
@@ -166,84 +165,84 @@ public class Wacka {
                 Parser.Command command = Parser.parse(input);
 
                 switch (command.type) {
-                    case BYE:
-                        ui.printGoodbye();
-                        scanner.close();
-                        return;
+                case BYE:
+                    ui.printGoodbye();
+                    scanner.close();
+                    return;
 
-                    case LIST:
-                        ui.showTaskList(tasks.getTasks(), tasks.getCount());
-                        break;
+                case LIST:
+                    ui.showTaskList(tasks.getTasks(), tasks.getCount());
+                    break;
 
-                    case FIND:
-                        Wacka.Task[] matchingTasks = tasks.findTasks(command.description);
-                        ui.showMatchingTasks(matchingTasks, matchingTasks.length);
-                        break;
+                case FIND:
+                    Wacka.Task[] matchingTasks = tasks.findTasks(command.description);
+                    ui.showMatchingTasks(matchingTasks, matchingTasks.length);
+                    break;
 
-                    case MARK:
-                        tasks.markTask(command.index);
-                        try {
-                            storage.save(tasks.getTasks());
-                        } catch (WackaException e) {
-                            ui.showError("Error saving tasks");
-                        }
-                        Task markedTask = tasks.getTask(command.index);
-                        ui.showMarkedTask(markedTask.getStatus(), markedTask.getDescription());
-                        break;
+                case MARK:
+                    tasks.markTask(command.index);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        ui.showError("Error saving tasks");
+                    }
+                    Task markedTask = tasks.getTask(command.index);
+                    ui.showMarkedTask(markedTask.getStatus(), markedTask.getDescription());
+                    break;
 
-                    case UNMARK:
-                        tasks.unmarkTask(command.index);
-                        try {
-                            storage.save(tasks.getTasks());
-                        } catch (WackaException e) {
-                            ui.showError("Error saving tasks");
-                        }
-                        Task unmarkedTask = tasks.getTask(command.index);
-                        ui.showUnmarkedTask(unmarkedTask.getStatus(), unmarkedTask.getDescription());
-                        break;
+                case UNMARK:
+                    tasks.unmarkTask(command.index);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        ui.showError("Error saving tasks");
+                    }
+                    Task unmarkedTask = tasks.getTask(command.index);
+                    ui.showUnmarkedTask(unmarkedTask.getStatus(), unmarkedTask.getDescription());
+                    break;
 
-                    case TODO:
-                        Task todo = new Todo(command.description);
-                        tasks.addTask(todo);
-                        try {
-                            storage.save(tasks.getTasks());
-                        } catch (WackaException e) {
-                            ui.showError("Error saving tasks");
-                        }
-                        ui.showTaskAdded(todo, tasks.getCount());
-                        break;
+                case TODO:
+                    Task todo = new Todo(command.description);
+                    tasks.addTask(todo);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        ui.showError("Error saving tasks");
+                    }
+                    ui.showTaskAdded(todo, tasks.getCount());
+                    break;
 
-                    case DEADLINE:
-                        Task deadline = new Deadline(command.description, command.date);
-                        tasks.addTask(deadline);
-                        try {
-                            storage.save(tasks.getTasks());
-                        } catch (WackaException e) {
-                            ui.showError("Error saving tasks");
-                        }
-                        ui.showTaskAdded(deadline, tasks.getCount());
-                        break;
+                case DEADLINE:
+                    Task deadline = new Deadline(command.description, command.date);
+                    tasks.addTask(deadline);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        ui.showError("Error saving tasks");
+                    }
+                    ui.showTaskAdded(deadline, tasks.getCount());
+                    break;
 
-                    case EVENT:
-                        Task event = new Event(command.description, command.date, command.toDate);
-                        tasks.addTask(event);
-                        try {
-                            storage.save(tasks.getTasks());
-                        } catch (WackaException e) {
-                            ui.showError("Error saving tasks");
-                        }
-                        ui.showTaskAdded(event, tasks.getCount());
-                        break;
+                case EVENT:
+                    Task event = new Event(command.description, command.date, command.toDate);
+                    tasks.addTask(event);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        ui.showError("Error saving tasks");
+                    }
+                    ui.showTaskAdded(event, tasks.getCount());
+                    break;
 
-                    case DELETE:
-                        Task deletedTask = tasks.deleteTask(command.index);
-                        try {
-                            storage.save(tasks.getTasks());
-                        } catch (WackaException e) {
-                            ui.showError("Error saving tasks");
-                        }
-                        ui.showTaskDeleted(deletedTask, tasks.getCount());
-                        break;
+                case DELETE:
+                    Task deletedTask = tasks.deleteTask(command.index);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        ui.showError("Error saving tasks");
+                    }
+                    ui.showTaskDeleted(deletedTask, tasks.getCount());
+                    break;
                 }
             } catch (WackaException e) {
                 ui.showError(e.getMessage());
@@ -255,5 +254,12 @@ public class Wacka {
     public static void main(String[] args) {
         String filePath = "data" + java.io.File.separator + "wacka.txt";
         new Wacka(filePath).run();
+    }
+
+    /**
+     * Generates a response for the user's chat message.
+     */
+    public String getResponse(String input) {
+        return "Duke heard: " + input;
     }
 }
