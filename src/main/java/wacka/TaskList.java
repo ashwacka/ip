@@ -16,13 +16,15 @@ public class TaskList {
     public TaskList(Wacka.Task[] tasks) {
         this.tasks = new Wacka.Task[100];
         this.count = 0;
-        if (tasks != null) {
-            for (Wacka.Task task : tasks) {
-                if (task != null && this.count < 100) {
-                    this.tasks[this.count] = task;
-                    this.count++;
-                }
+        if (tasks == null) {
+            return;
+        }
+        for (Wacka.Task task : tasks) {
+            if (task == null || this.count >= 100) {
+                continue;
             }
+            this.tasks[this.count] = task;
+            this.count++;
         }
     }
 
