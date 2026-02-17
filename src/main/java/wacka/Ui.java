@@ -39,6 +39,8 @@ public class Ui {
     }
 
     public void showTaskList(Wacka.Task[] tasks, int count) {
+        assert tasks != null : "tasks array must not be null";
+        assert count >= 0 && count <= tasks.length : "count must be valid for tasks array";
         System.out.println(DIVIDER);
         System.out.println("Here are the tasks in your list:");
         for (int i = 0; i < count; i++) {

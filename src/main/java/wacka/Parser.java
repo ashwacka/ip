@@ -141,6 +141,7 @@ public class Parser {
         public LocalDate toDate;
 
         public Command(CommandType type, int index, String description, LocalDate date, LocalDate toDate) {
+            assert type != null : "command type must not be null";
             this.type = type;
             this.index = index;
             this.description = description;

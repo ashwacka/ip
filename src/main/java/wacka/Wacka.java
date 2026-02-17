@@ -141,6 +141,7 @@ public class Wacka {
     }
 
     public Wacka(String filePath) {
+        assert filePath != null && !filePath.isEmpty() : "filePath must not be null or empty";
         ui = new Ui();
         storage = new Storage(filePath);
         try {
@@ -149,6 +150,9 @@ public class Wacka {
             ui.showLoadingError();
             tasks = new TaskList();
         }
+        assert storage != null : "storage must be initialised";
+        assert ui != null : "ui must be initialised";
+        assert tasks != null : "tasks must be initialised";
     }
 
     /**
@@ -260,6 +264,7 @@ public class Wacka {
      * Generates a response for the user's chat message.
      */
     public String getResponse(String input) {
+        assert input != null : "user input must not be null";
         return "Duke heard: " + input;
     }
 }

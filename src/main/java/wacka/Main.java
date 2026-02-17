@@ -13,8 +13,10 @@ public class Main extends Application {
     private Wacka wacka;
 
     public Main(String filePath) {
+        assert filePath != null && !filePath.isEmpty() : "filePath must not be null or empty";
         this.filePath = filePath;
         this.wacka = new Wacka(filePath);
+        assert this.wacka != null : "wacka must be initialised";
     }
 
     public Main() {
