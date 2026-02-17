@@ -36,8 +36,11 @@ public class Parser {
                     throw new Wacka.WackaException("Ohno! Please provide a valid task number!");
                 }
 
-            case "list":
-                return new Command(CommandType.LIST, -1, null, null, null);
+            case "list": {
+                Command cmd = new Command(CommandType.LIST, -1, null, null, null);
+                assert cmd.type == CommandType.LIST && cmd.index == -1 : "list command must have correct type and index";
+                return cmd;
+            }
 
             case "find":
                 if (words.length < 2) {
@@ -134,6 +137,7 @@ public class Parser {
         public LocalDate toDate;
 
         public Command(CommandType type, int index, String description, LocalDate date, LocalDate toDate) {
+            assert type != null : "command type must not be null";
             this.type = type;
             this.index = index;
             this.description = description;

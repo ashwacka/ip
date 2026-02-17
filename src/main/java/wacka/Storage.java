@@ -53,12 +53,14 @@ public class Storage {
             throw new Wacka.WackaException("Error loading tasks from file");
         }
 
+        assert count >= 0 && count <= tasks.length : "load count must be in valid range";
         Wacka.Task[] result = new Wacka.Task[count];
         System.arraycopy(tasks, 0, result, 0, count);
         return result;
     }
 
     public void save(Wacka.Task[] tasks) throws Wacka.WackaException {
+        assert tasks != null : "tasks array to save must not be null";
         try {
             File file = new File(filePath);
             File parentDir = file.getParentFile();

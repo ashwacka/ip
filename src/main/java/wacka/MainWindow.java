@@ -42,6 +42,7 @@ public class MainWindow extends AnchorPane {
      */
     @FXML
     private void handleUserInput() {
+        assert wacka != null : "wacka must be set before handling input";
         String input = userInput.getText();
         String response = wacka.getResponse(input);
         dialogContainer.getChildren().addAll(

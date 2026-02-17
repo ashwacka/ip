@@ -11,6 +11,7 @@ public class TaskList {
     public TaskList() {
         this.tasks = new Wacka.Task[100];
         this.count = 0;
+        assert this.count >= 0 && this.count <= this.tasks.length : "count must be in valid range after init";
     }
 
     public TaskList(Wacka.Task[] tasks) {
@@ -27,6 +28,7 @@ public class TaskList {
     }
 
     public void addTask(Wacka.Task task) {
+        assert task != null : "task to add must not be null";
         if (count < tasks.length) {
             tasks[count] = task;
             count++;
@@ -50,7 +52,8 @@ public class TaskList {
         }
         tasks[count - 1] = null;
         count--;
-        
+
+        assert deletedTask != null : "deleted task must not be null";
         return deletedTask;
     }
 
@@ -58,7 +61,9 @@ public class TaskList {
         if (index < 0 || index >= count) {
             throw new Wacka.WackaException("Ohno! Invalid task index!");
         }
-        return tasks[index];
+        Wacka.Task task = tasks[index];
+        assert task != null : "task at valid index must not be null";
+        return task;
     }
 
     public void markTask(int index) throws Wacka.WackaException {
@@ -78,6 +83,7 @@ public class TaskList {
     public Wacka.Task[] getTasks() {
         Wacka.Task[] result = new Wacka.Task[count];
         System.arraycopy(tasks, 0, result, 0, count);
+        assert result.length == count : "returned array length must match count";
         return result;
     }
 
