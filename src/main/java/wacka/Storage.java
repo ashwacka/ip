@@ -85,49 +85,57 @@ public class Storage {
             if (parts.length < 3) {
                 throw new Wacka.WackaException("Invalid task format in file");
             }
-
             String type = parts[0];
             boolean isDone = parts[1].equals("1");
             String description = parts[2];
 
-            Wacka.Task task;
-            switch (type) {
-                case "T":
-                    task = new Wacka.Todo(description);
-                    break;
-                case "D":
-                    if (parts.length < 4) {
-                        throw new Wacka.WackaException("Invalid deadline format in file");
-                    }
-                    try {
-                        LocalDate byDate = LocalDate.parse(parts[3].trim());
-                        task = new Wacka.Deadline(description, byDate);
-                    } catch (DateTimeParseException e) {
-                        throw new Wacka.WackaException("Invalid date format in file: " + parts[3]);
-                    }
-                    break;
-                case "E":
-                    if (parts.length < 5) {
-                        throw new Wacka.WackaException("Invalid event format in file");
-                    }
-                    try {
-                        LocalDate fromDate = LocalDate.parse(parts[3].trim());
-                        LocalDate toDate = LocalDate.parse(parts[4].trim());
-                        task = new Wacka.Event(description, fromDate, toDate);
-                    } catch (DateTimeParseException e) {
-                        throw new Wacka.WackaException("Invalid date format in file");
-                    }
-                    break;
-                default:
-                    throw new Wacka.WackaException("Unknown task type in file: " + type);
-            }
-
+            Wacka.Task task = createTaskByType(type, parts, description);
             if (isDone) {
                 task.markAsDone();
             }
             return task;
+        } catch (Wacka.WackaException e) {
+            throw e;
         } catch (Exception e) {
             throw new Wacka.WackaException("Error parsing task from file: " + e.getMessage());
+        }
+    }
+
+    private Wacka.Task createTaskByType(String type, String[] parts, String description) throws Wacka.WackaException {
+        switch (type) {
+        case "T":
+            return new Wacka.Todo(description);
+        case "D":
+            return parseDeadlineFromParts(parts, description);
+        case "E":
+            return parseEventFromParts(parts, description);
+        default:
+            throw new Wacka.WackaException("Unknown task type in file: " + type);
+        }
+    }
+
+    private Wacka.Task parseDeadlineFromParts(String[] parts, String description) throws Wacka.WackaException {
+        if (parts.length < 4) {
+            throw new Wacka.WackaException("Invalid deadline format in file");
+        }
+        try {
+            LocalDate byDate = LocalDate.parse(parts[3].trim());
+            return new Wacka.Deadline(description, byDate);
+        } catch (DateTimeParseException e) {
+            throw new Wacka.WackaException("Invalid date format in file: " + parts[3]);
+        }
+    }
+
+    private Wacka.Task parseEventFromParts(String[] parts, String description) throws Wacka.WackaException {
+        if (parts.length < 5) {
+            throw new Wacka.WackaException("Invalid event format in file");
+        }
+        try {
+            LocalDate fromDate = LocalDate.parse(parts[3].trim());
+            LocalDate toDate = LocalDate.parse(parts[4].trim());
+            return new Wacka.Event(description, fromDate, toDate);
+        } catch (DateTimeParseException e) {
+            throw new Wacka.WackaException("Invalid date format in file");
         }
     }
 }
