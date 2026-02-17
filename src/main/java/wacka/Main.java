@@ -33,6 +33,7 @@ public class Main extends Application {
             
             MainWindow mainWindow = fxmlLoader.getController();
             mainWindow.setWacka(wacka);
+            mainWindow.showWelcome();
             
             stage.setTitle("Wacka - " + filePath);
             stage.setResizable(false);

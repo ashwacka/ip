@@ -30,6 +30,19 @@ public class MainWindow extends AnchorPane {
         // Scroll down to the end every time dialogContainer's height changes.
         dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
     }
+    
+    /**
+     * Shows the welcome message when the GUI starts.
+     * Should be called after setWacka() is called.
+     */
+    public void showWelcome() {
+        if (wacka != null) {
+            String welcome = wacka.getWelcomeMessage();
+            dialogContainer.getChildren().add(
+                    DialogBox.getWackaDialog(welcome, botImage)
+            );
+        }
+    }
 
     /** Injects the Wacka instance */
     public void setWacka(Wacka w) {
@@ -46,8 +59,8 @@ public class MainWindow extends AnchorPane {
         String input = userInput.getText();
         String response = wacka.getResponse(input);
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, botImage),
-                DialogBox.getWackaDialog(response, userImage)
+                DialogBox.getUserDialog(input, userImage),
+                DialogBox.getWackaDialog(response, botImage)
         );
         userInput.clear();
     }

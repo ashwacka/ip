@@ -261,10 +261,97 @@ public class Wacka {
     }
 
     /**
+     * Returns the welcome message for the GUI.
+     */
+    public String getWelcomeMessage() {
+        return ui.getWelcomeMessage();
+    }
+
+    /**
      * Generates a response for the user's chat message.
+     * Processes commands and returns formatted responses for the GUI.
      */
     public String getResponse(String input) {
         assert input != null : "user input must not be null";
-        return "Duke heard: " + input;
+        
+        try {
+            Parser.Command command = Parser.parse(input);
+
+            switch (command.type) {
+            case BYE:
+                return ui.getGoodbyeMessage();
+
+            case LIST:
+                return ui.getTaskListMessage(tasks.getTasks(), tasks.getCount());
+
+            case FIND:
+                Wacka.Task[] matchingTasks = tasks.findTasks(command.description);
+                return ui.getMatchingTasksMessage(matchingTasks, matchingTasks.length);
+
+            case MARK:
+                tasks.markTask(command.index);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                Task markedTask = tasks.getTask(command.index);
+                return ui.getMarkedTaskMessage(markedTask.getStatus(), markedTask.getDescription());
+
+            case UNMARK:
+                tasks.unmarkTask(command.index);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                Task unmarkedTask = tasks.getTask(command.index);
+                return ui.getUnmarkedTaskMessage(unmarkedTask.getStatus(), unmarkedTask.getDescription());
+
+            case TODO:
+                Task todo = new Todo(command.description);
+                tasks.addTask(todo);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                return ui.getTaskAddedMessage(todo, tasks.getCount());
+
+            case DEADLINE:
+                Task deadline = new Deadline(command.description, command.date);
+                tasks.addTask(deadline);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                return ui.getTaskAddedMessage(deadline, tasks.getCount());
+
+            case EVENT:
+                Task event = new Event(command.description, command.date, command.toDate);
+                tasks.addTask(event);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                return ui.getTaskAddedMessage(event, tasks.getCount());
+
+            case DELETE:
+                Task deletedTask = tasks.deleteTask(command.index);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                return ui.getTaskDeletedMessage(deletedTask, tasks.getCount());
+
+            default:
+                return ui.getErrorMessage("Oops! I do not know what to do with this :(");
+            }
+        } catch (WackaException e) {
+            return ui.getErrorMessage(e.getMessage());
+        }
     }
 }

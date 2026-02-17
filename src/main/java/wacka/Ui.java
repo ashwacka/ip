@@ -84,4 +84,59 @@ public class Ui {
     public void showLoadingError() {
         System.out.println("Error loading tasks from file. Creating new empty list.");
     }
+
+    // GUI-friendly methods that return formatted strings instead of printing
+
+    public String getWelcomeMessage() {
+        return "Hello! I'm Wacka\nWhat can I do for you?";
+    }
+
+    public String getGoodbyeMessage() {
+        return "Bye. Hope to see you again soon!";
+    }
+
+    public String getErrorMessage(String message) {
+        return message;
+    }
+
+    public String getMarkedTaskMessage(String status, String description) {
+        return "Good Job! I have marked this task as completed ⭐️\n" + status + " " + description;
+    }
+
+    public String getUnmarkedTaskMessage(String status, String description) {
+        return "Okay! I have marked this task as incomplete\n" + status + " " + description;
+    }
+
+    public String getTaskListMessage(Wacka.Task[] tasks, int count) {
+        assert tasks != null : "tasks array must not be null";
+        assert count >= 0 && count <= tasks.length : "count must be valid for tasks array";
+        if (count == 0) {
+            return "Your task list is empty!";
+        }
+        StringBuilder sb = new StringBuilder("Here are the tasks in your list:\n");
+        for (int i = 0; i < count; i++) {
+            sb.append((i + 1)).append(".").append(tasks[i]).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    public String getMatchingTasksMessage(Wacka.Task[] tasks, int count) {
+        boolean isEmpty = (tasks == null || tasks.length == 0 || count <= 0);
+        if (isEmpty) {
+            return "No matching tasks found.";
+        }
+        StringBuilder sb = new StringBuilder("Here are the matching tasks in your list:\n");
+        for (int i = 0; i < count; i++) {
+            sb.append((i + 1)).append(".").append(tasks[i]).append("\n");
+        }
+        return sb.toString().trim();
+    }
+
+    public String getTaskAddedMessage(Wacka.Task task, int totalTasks) {
+        return "Got it! I've added this task:\n  " + task + "\nNow you have " + totalTasks + " tasks in the list.";
+    }
+
+    public String getTaskDeletedMessage(Wacka.Task task, int totalTasks) {
+        return "Okay! I've deleted this task:\n" + task.toString() + "\nNow you have " + totalTasks + " tasks in the list.";
+    }
 }
