@@ -111,6 +111,8 @@ public class Storage {
             return parseDeadlineFromParts(parts, description);
         case "E":
             return parseEventFromParts(parts, description);
+        case "R":
+            return parseRecurringFromParts(parts, description);
         default:
             throw new Wacka.WackaException("Unknown task type in file: " + type);
         }
@@ -136,6 +138,22 @@ public class Storage {
             LocalDate fromDate = LocalDate.parse(parts[3].trim());
             LocalDate toDate = LocalDate.parse(parts[4].trim());
             return new Wacka.Event(description, fromDate, toDate);
+        } catch (DateTimeParseException e) {
+            throw new Wacka.WackaException("Invalid date format in file");
+        }
+    }
+
+    private Wacka.Task parseRecurringFromParts(String[] parts, String description) throws Wacka.WackaException {
+        if (parts.length < 6) {
+            throw new Wacka.WackaException("Invalid recurring task format in file");
+        }
+        try {
+            String recurrenceType = parts[3].trim();
+            LocalDate nextOccurrence = LocalDate.parse(parts[4].trim());
+            LocalDate startDate = LocalDate.parse(parts[5].trim());
+            Wacka.RecurringTask task = new Wacka.RecurringTask(description, recurrenceType, startDate);
+            task.setNextOccurrence(nextOccurrence); // Override calculated nextOccurrence with saved value
+            return task;
         } catch (DateTimeParseException e) {
             throw new Wacka.WackaException("Invalid date format in file");
         }

@@ -28,6 +28,8 @@ public class Parser {
             return parseDeadline(input);
         case "event":
             return parseEvent(input);
+        case "recur":
+            return parseRecur(input);
         case "delete":
             return parseDelete(words);
         case "bye":
@@ -133,13 +135,51 @@ public class Parser {
         }
     }
 
+    private static Command parseRecur(String input) throws Wacka.WackaException {
+        String rest = input.length() < 6 ? "" : input.substring(6).trim();
+        String[] parts = rest.split(" /every ");
+        if (parts.length < 2) {
+            throw new Wacka.WackaException("Ohno! Please use recur <description> /every <DAILY|WEEKLY|MONTHLY|YEARLY> [/from <start-date>]");
+        }
+        String description = parts[0].trim();
+        String restAfterEvery = parts[1].trim();
+        
+        // Check for optional /from date
+        String[] recurrenceParts = restAfterEvery.split(" /from ");
+        String recurrenceTypeStr = recurrenceParts[0].trim().toUpperCase();
+        LocalDate startDate = LocalDate.now(); // Default to today
+        
+        if (recurrenceParts.length > 1) {
+            try {
+                startDate = LocalDate.parse(recurrenceParts[1].trim());
+            } catch (DateTimeParseException e) {
+                throw new Wacka.WackaException("Ohno! Please use yyyy-mm-dd format for start date (e.g., 2019-12-02)");
+            }
+        }
+        
+        if (description.isEmpty()) {
+            throw new Wacka.WackaException("Ohno! Please describe the recurring task!");
+        }
+        if (recurrenceTypeStr.isEmpty()) {
+            throw new Wacka.WackaException("Ohno! Please specify the recurrence type!");
+        }
+        try {
+            Wacka.RecurrenceType recurrenceTypeEnum = Wacka.RecurrenceType.valueOf(recurrenceTypeStr);
+            Command cmd = new Command(CommandType.RECUR, -1, description, null, null);
+            cmd.recurrenceType = recurrenceTypeEnum;
+            cmd.date = startDate; // Use date field for startDate
+            return cmd;
+        } catch (IllegalArgumentException e) {
+            throw new Wacka.WackaException("Ohno! Please use a valid recurrence type: DAILY, WEEKLY, MONTHLY, YEARLY");
+        }
+    }
     public static class Command {
         public CommandType type;
         public int index;
         public String description;
         public LocalDate date;
         public LocalDate toDate;
-
+        public Wacka.RecurrenceType recurrenceType;
         public Command(CommandType type, int index, String description, LocalDate date, LocalDate toDate) {
             assert type != null : "command type must not be null";
             this.type = type;
@@ -151,6 +191,6 @@ public class Parser {
     }
 
     public enum CommandType {
-        MARK, UNMARK, LIST, FIND, TODO, DEADLINE, EVENT, DELETE, BYE
+        MARK, UNMARK, LIST, FIND, TODO, DEADLINE, EVENT, RECUR, DELETE, BYE
     }
 }

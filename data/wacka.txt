@@ -1,3 +1,5 @@
 T | 0 | read
 T | 1 | read book
 T | 0 | chatbot
+R | 0 | meeting | DAILY | 2026-03-14 | 2026-03-13
+R | 0 | exercise | MONTHLY | 2026-08-01 | 2026-07-01

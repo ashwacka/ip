@@ -1,5 +1,7 @@
 package wacka;
 
+import java.time.LocalDate;
+
 public class Ui {
     private static final String DIVIDER = "____________________________________________________________";
 
@@ -84,9 +86,8 @@ public class Ui {
     public void showLoadingError() {
         System.out.println("Error loading tasks from file. Creating new empty list.");
     }
-
-    // GUI-friendly methods that return formatted strings instead of printing
-
+    
+    //UI for GUI
     public String getWelcomeMessage() {
         return "Hello! I'm Wacka\nWhat can I do for you?";
     }
@@ -101,6 +102,11 @@ public class Ui {
 
     public String getMarkedTaskMessage(String status, String description) {
         return "Good Job! I have marked this task as completed ⭐️\n" + status + " " + description;
+    }
+
+    public String getMarkedRecurringTaskMessage(String status, String description, LocalDate nextOccurrence, String recurrenceType) {
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("MMM dd yyyy");
+        return "Good Job! I have marked this recurring task as completed ⭐️\n" + status + " " + description + "\nNext occurrence created: [R][ ] " + description + " (repeats " + recurrenceType + ", next: " + nextOccurrence.format(formatter) + ")";
     }
 
     public String getUnmarkedTaskMessage(String status, String description) {

@@ -82,6 +82,17 @@ public class TaskList {
         tasks[index].unMark();
     }
 
+    /**
+     * Replaces the task at the specified index with a new task.
+     */
+    public void replaceTask(int index, Wacka.Task newTask) throws Wacka.WackaException {
+        if (index < 0 || index >= count) {
+            throw new Wacka.WackaException("Ohno! Invalid task index!");
+        }
+        assert newTask != null : "new task must not be null";
+        tasks[index] = newTask;
+    }
+
     public Wacka.Task[] getTasks() {
         Wacka.Task[] result = new Wacka.Task[count];
         System.arraycopy(tasks, 0, result, 0, count);

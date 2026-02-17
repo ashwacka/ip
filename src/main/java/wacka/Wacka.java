@@ -76,6 +76,79 @@ public class Wacka {
         }
     }
 
+    public enum RecurrenceType {
+        DAILY, WEEKLY, MONTHLY, YEARLY;
+    }
+
+    public static LocalDate calculateNextOccurrence(LocalDate current, RecurrenceType type) {
+        switch (type) {
+        case DAILY:
+            return current.plusDays(1);
+        case WEEKLY:
+            return current.plusWeeks(1);
+        case MONTHLY:
+            return current.plusMonths(1);
+        case YEARLY:
+            return current.plusYears(1);
+        default:
+            return current;
+        }
+    }
+
+    public static class RecurringTask extends Task {
+        private String recurrenceType;
+        private LocalDate nextOccurrence;
+        private LocalDate startDate;
+
+        public RecurringTask(String description, String recurrenceType, LocalDate startDate) {
+            super(description);
+            this.recurrenceType = recurrenceType;
+            this.startDate = startDate;
+            this.nextOccurrence = calculateNextOccurrence(startDate, RecurrenceType.valueOf(recurrenceType));
+        }
+
+        @Override
+        public String getType() {
+            return "R";
+        }
+
+        @Override
+        public String toFileFormat() {
+            return "R | " + (isDone ? "1" : "0") + " | " + description + " | " + recurrenceType + " | " + nextOccurrence.toString() + " | " + startDate.toString();
+        }
+
+        @Override
+        public String toString() {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy");
+            return "[" + getType() + "]" + getStatus() + " " + getDescription() + " (repeats " + recurrenceType + ", next: " + nextOccurrence.format(formatter) + ")";
+        }
+
+        public String getRecurrenceType() {
+            return recurrenceType;
+        }
+
+        public LocalDate getNextOccurrence() {
+            return nextOccurrence;
+        }
+
+        public LocalDate getStartDate() {
+            return startDate;
+        }
+
+        public void setNextOccurrence(LocalDate nextOccurrence) {
+            this.nextOccurrence = nextOccurrence;
+        }
+
+        public void setStartDate(LocalDate startDate) {
+            this.startDate = startDate;
+        }
+
+        public void setRecurrenceType(String recurrenceType) {
+            this.recurrenceType = recurrenceType;
+        }
+    }
+
+
     public static class Deadline extends Task {
         private LocalDate by;
 
@@ -289,15 +362,45 @@ public class Wacka {
                 return ui.getMatchingTasksMessage(matchingTasks, matchingTasks.length);
 
             case MARK:
-                tasks.markTask(command.index);
-                try {
-                    storage.save(tasks.getTasks());
-                } catch (WackaException e) {
-                    return ui.getErrorMessage("Error saving tasks");
+                Task taskToMark = tasks.getTask(command.index);
+                
+                if (taskToMark instanceof RecurringTask) {
+                    RecurringTask recurringTask = (RecurringTask) taskToMark;
+                    // Mark the old task as done for the message
+                    recurringTask.markAsDone();
+                    
+                    // Create new instance for next occurrence
+                    LocalDate nextStartDate = recurringTask.getNextOccurrence();
+                    RecurringTask nextOccurrence = new RecurringTask(
+                        recurringTask.getDescription(), 
+                        recurringTask.getRecurrenceType(), 
+                        nextStartDate
+                    );
+                    
+                    // Replace the old task with the new occurrence
+                    tasks.replaceTask(command.index, nextOccurrence);
+                    
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        return ui.getErrorMessage("Error saving tasks");
+                    }
+                    return ui.getMarkedRecurringTaskMessage(
+                        recurringTask.getStatus(), 
+                        recurringTask.getDescription(), 
+                        nextOccurrence.getNextOccurrence(),
+                        recurringTask.getRecurrenceType()
+                    );
+                } else {
+                    tasks.markTask(command.index);
+                    try {
+                        storage.save(tasks.getTasks());
+                    } catch (WackaException e) {
+                        return ui.getErrorMessage("Error saving tasks");
+                    }
+                    return ui.getMarkedTaskMessage(taskToMark.getStatus(), taskToMark.getDescription());
                 }
-                Task markedTask = tasks.getTask(command.index);
-                return ui.getMarkedTaskMessage(markedTask.getStatus(), markedTask.getDescription());
-
+            
             case UNMARK:
                 tasks.unmarkTask(command.index);
                 try {
@@ -337,6 +440,18 @@ public class Wacka {
                     return ui.getErrorMessage("Error saving tasks");
                 }
                 return ui.getTaskAddedMessage(event, tasks.getCount());
+
+            case RECUR:
+                String recurrenceTypeStr = command.recurrenceType.toString();
+                LocalDate startDate = command.date != null ? command.date : LocalDate.now();
+                Task recurringTask = new RecurringTask(command.description, recurrenceTypeStr, startDate);
+                tasks.addTask(recurringTask);
+                try {
+                    storage.save(tasks.getTasks());
+                } catch (WackaException e) {
+                    return ui.getErrorMessage("Error saving tasks");
+                }
+                return ui.getTaskAddedMessage(recurringTask, tasks.getCount());
 
             case DELETE:
                 Task deletedTask = tasks.deleteTask(command.index);
