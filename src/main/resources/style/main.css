@@ -1,0 +1,116 @@
+/* A-BetterGui: asymmetric conversation, error highlight, compact layout */
+
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #f5f5f5;
+}
+
+/* Input area */
+#userInput {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-padding: 10 16;
+    -fx-font-size: 13px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 4, 0, 0, 1);
+}
+#userInput:focused {
+    -fx-border-color: #90caf9;
+    -fx-border-width: 2;
+}
+
+#sendButton {
+    -fx-background-color: #42a5f5;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-padding: 10 20;
+}
+#sendButton:hover {
+    -fx-background-color: #1e88e5;
+}
+
+/* Scroll pane: no extra chrome, use space */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+.scroll-pane .scroll-bar .thumb {
+    -fx-background-color: #bdbdbd;
+    -fx-background-radius: 4;
+}
+
+/* Dialog container */
+#dialogContainer {
+    -fx-spacing: 8;
+    -fx-padding: 12 12 8 12;
+    -fx-background-color: transparent;
+}
+
+/* ===== Asymmetric: User messages ===== */
+.dialog-user .dialog-label {
+    -fx-background-color: #42a5f5;
+    -fx-text-fill: white;
+    -fx-background-radius: 16 16 4 16;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+    -fx-max-width: 280;
+    -fx-alignment: center-right;
+}
+.dialog-user .avatar-pane {
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+
+/* ===== Asymmetric: Bot messages (Wacka) ===== */
+.dialog-bot .dialog-label {
+    -fx-background-color: white;
+    -fx-text-fill: #212121;
+    -fx-background-radius: 16 16 16 4;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 16 16 16 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 2, 0, 0, 1);
+}
+.dialog-bot .avatar-pane {
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+
+/* ===== Error messages: catch attention ===== */
+.dialog-error .dialog-label {
+    -fx-background-color: #ffebee;
+    -fx-text-fill: #c62828;
+    -fx-background-radius: 16 16 16 4;
+    -fx-padding: 10 14;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+    -fx-border-color: #ef9a9a;
+    -fx-border-width: 1;
+    -fx-border-radius: 16 16 16 4;
+    -fx-font-weight: bold;
+}
+.dialog-error .avatar-pane {
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+}
+
+/* Dialog row layout */
+.dialog-box {
+    -fx-spacing: 8;
+    -fx-padding: 2 0;
+}

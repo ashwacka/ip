@@ -39,7 +39,7 @@ public class MainWindow extends AnchorPane {
         if (wacka != null) {
             String welcome = wacka.getWelcomeMessage();
             dialogContainer.getChildren().add(
-                    DialogBox.getWackaDialog(welcome, botImage)
+                    DialogBox.getWackaDialog(welcome, userImage)
             );
         }
     }
@@ -57,10 +57,14 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         assert wacka != null : "wacka must be set before handling input";
         String input = userInput.getText();
+        if (input == null || input.isBlank()) {
+            return;
+        }
         String response = wacka.getResponse(input);
+        boolean isError = response.startsWith("Ohno!") || response.startsWith("Error");
         dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getWackaDialog(response, botImage)
+                DialogBox.getUserDialog(input, botImage),
+                isError ? DialogBox.getWackaErrorDialog(response, userImage) : DialogBox.getWackaDialog(response, userImage)
         );
         userInput.clear();
     }

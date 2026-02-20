@@ -29,16 +29,17 @@ public class Main extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
             javafx.scene.layout.AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
+            scene.getStylesheets().add(Main.class.getResource("/style/main.css").toExternalForm());
             stage.setScene(scene);
-            
+
             MainWindow mainWindow = fxmlLoader.getController();
             mainWindow.setWacka(wacka);
             mainWindow.showWelcome();
-            
-            stage.setTitle("Wacka - " + filePath);
-            stage.setResizable(false);
-            stage.setMinHeight(600.0);
-            stage.setMinWidth(400.0);
+
+            stage.setTitle("welcome to wacka chatbot");
+            stage.setResizable(true);
+            stage.setMinHeight(320.0);
+            stage.setMinWidth(300.0);
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
