@@ -1,19 +1,19 @@
 # Wacka — User Guide
 
-Wacka is a chatbot that helps you manage tasks. Chat in natural commands to add todos, deadlines, events, and recurring tasks, then list, mark, or find them.
+**Welcome to Wacka!** Wacka is your own personal chatbot that helps you manage tasks. Chat in natural commands to add todos, deadlines, events, and recurring tasks, then list, mark, or find them.
 
 ---
 
 ## Quick start
 
 **Run the app (GUI)**  
-Double-click the run configuration for `wacka.Launcher`, or from the project folder:
+- Ensure you have Java 17 or above installed.
+- Download the latest ```wacka.jar``` from the Releases page
+- Copy the file to the folder you want to use as your Wacka home folder. 
+- Open a terminal, cd into that folder, and run:
+```java -jar wacka.jar```
 
-```bash
-./gradlew run
-```
-
-The chat window opens. Type in the box at the bottom and press **Send** (or Enter).
+The Wacka chat window opens. Type in the box at the bottom and press **Send** (or Enter).
 
 ---
 
@@ -52,3 +52,4 @@ Tasks are saved in `data/wacka.txt` in the project folder. The file is updated w
 
 - **JDK 17**
 - For GUI: JavaFX (included via Gradle)
+
