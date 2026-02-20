@@ -1,26 +1,54 @@
-# wacka.Wacka project template
+# Wacka — User Guide
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+Wacka is a chatbot that helps you manage tasks. Chat in natural commands to add todos, deadlines, events, and recurring tasks, then list, mark, or find them.
 
-## Setting up in Intellij
+---
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+## Quick start
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/wacka.Wacka.java` file, right-click it, and choose `Run wacka.Wacka.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+**Run the app (GUI)**  
+Double-click the run configuration for `wacka.Launcher`, or from the project folder:
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+```bash
+./gradlew run
+```
+
+The chat window opens. Type in the box at the bottom and press **Send** (or Enter).
+
+---
+
+## Commands
+
+| Command | Example |
+|--------|---------|
+| **list** | `list` — show all tasks |
+| **todo** | `todo read book` — add a todo |
+| **deadline** | `deadline submit report /by 2026-03-01` — add a deadline (use `yyyy-mm-dd`) |
+| **event** | `event meeting /from 2026-02-20 /to 2026-02-21` — add an event |
+| **recur** | `recur Weekly sync /every WEEKLY` — add a recurring task (DAILY, WEEKLY, MONTHLY, YEARLY). Optional: `/from 2026-02-20` |
+| **mark** | `mark 1` — mark task #1 as done (recurring tasks are replaced by the next occurrence) |
+| **unmark** | `unmark 1` — mark task #1 as not done |
+| **delete** | `delete 2` — remove task #2 |
+| **find** | `find book` — list tasks whose description contains “book” |
+| **bye** | `bye` — close the chat |
+
+---
+
+## Tips
+
+- **Dates** Use `yyyy-mm-dd` (e.g. `2026-02-20`).
+- **Recurring tasks** When you mark one done, it is replaced by the next occurrence (e.g. next week) in the same list position.
+- **Errors** Invalid commands or missing details show in a red-highlighted message; fix the command and try again.
+
+---
+
+## Where is my data?
+
+Tasks are saved in `data/wacka.txt` in the project folder. The file is updated when you add, mark, unmark, or delete tasks.
+
+---
+
+## Requirements
+
+- **JDK 17**
+- For GUI: JavaFX (included via Gradle)
