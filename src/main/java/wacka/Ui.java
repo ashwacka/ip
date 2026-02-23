@@ -2,11 +2,16 @@ package wacka;
 
 import java.time.LocalDate;
 
+/**
+ * Represents the user interface for the Wacka chatbot.
+ * Provides methods to print messages to the console and the GUI.
+ */
+
 public class Ui {
     private static final String DIVIDER = "____________________________________________________________";
 
     /**
-     * Prints the default welcome
+     * Print the default welcome message to the console.
      */
     public void printWelcome() {
         System.out.println("Hello! I'm Wacka");
@@ -87,7 +92,6 @@ public class Ui {
         System.out.println("Error loading tasks from file. Creating new empty list.");
     }
     
-    //UI for GUI
     public String getWelcomeMessage() {
         return "Hello! I'm Wacka\nWhat can I do for you?";
     }

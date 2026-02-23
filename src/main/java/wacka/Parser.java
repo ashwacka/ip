@@ -9,6 +9,9 @@ import java.time.format.DateTimeParseException;
  */
 
 public class Parser {
+    /**
+     * Parses the user input string and returns the corresponding Command.
+     */
     public static Command parse(String input) throws Wacka.WackaException {
         String[] words = input.split(" ");
         String command = words[0].toLowerCase();
@@ -38,6 +41,14 @@ public class Parser {
             throw new Wacka.WackaException("Oops! I do not know what to do with this :(");
         }
     }
+
+    /**
+     * Parses the input and returns a Command object.
+     * @param words the words of the input
+     * @param type the type of the command
+     * @return a Command object
+     * @throws Wacka.WackaException if the input is invalid
+     */
 
     private static Command parseIndexCommand(String[] words, CommandType type) throws Wacka.WackaException {
         if (words.length < 2) {
