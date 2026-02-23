@@ -13,7 +13,7 @@ import java.time.format.DateTimeParseException;
  * Loads and saves tasks to/from files.
  */
 public class Storage {
-    private String filePath;
+    private final String filePath;
 
     public Storage(String filePath) {
         this.filePath = filePath;
@@ -58,6 +58,12 @@ public class Storage {
         System.arraycopy(tasks, 0, result, 0, count);
         return result;
     }
+
+    /**
+     * Saves the tasks to the file.
+     * @param tasks the tasks to save
+     * @throws Wacka.WackaException if the tasks cannot be saved
+     */
 
     public void save(Wacka.Task[] tasks) throws Wacka.WackaException {
         assert tasks != null : "tasks array to save must not be null";
