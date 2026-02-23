@@ -13,6 +13,7 @@ import java.time.format.DateTimeParseException;
  * Loads and saves tasks to/from files.
  */
 public class Storage {
+    private static final int MAX_TASKS_TO_LOAD = 100;
     private final String filePath;
 
     public Storage(String filePath) {
@@ -23,7 +24,7 @@ public class Storage {
      * Loads tasks from data
      */
     public Wacka.Task[] load() throws Wacka.WackaException {
-        Wacka.Task[] tasks = new Wacka.Task[100];
+        Wacka.Task[] tasks = new Wacka.Task[MAX_TASKS_TO_LOAD];
         int count = 0;
 
         try {
@@ -36,7 +37,7 @@ public class Storage {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
 
-            while ((line = reader.readLine()) != null && count < tasks.length) {
+            while ((line = reader.readLine()) != null && count < MAX_TASKS_TO_LOAD) {
                 line = line.trim();
                 if (line.isEmpty()) {
                     continue;
