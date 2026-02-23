@@ -53,6 +53,10 @@ public class MainWindow extends AnchorPane {
      * Creates two dialog boxes, one echoing user input and the other containing Duke's reply and then appends them to
      * the dialog container. Clears the user input after processing.
      */
+    private static boolean isErrorResponse(String response) {
+        return response.startsWith("Ohno!") || response.startsWith("Error");
+    }
+
     @FXML
     private void handleUserInput() {
         assert wacka != null : "wacka must be set before handling input";
@@ -61,10 +65,9 @@ public class MainWindow extends AnchorPane {
             return;
         }
         String response = wacka.getResponse(input);
-        boolean isError = response.startsWith("Ohno!") || response.startsWith("Error");
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, botImage),
-                isError ? DialogBox.getWackaErrorDialog(response, userImage) : DialogBox.getWackaDialog(response, userImage)
+                isErrorResponse(response) ? DialogBox.getWackaErrorDialog(response, userImage) : DialogBox.getWackaDialog(response, userImage)
         );
         userInput.clear();
     }
