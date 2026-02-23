@@ -5,23 +5,24 @@ package wacka;
  */
 
 public class TaskList {
+    private static final int TASK_CAPACITY = 100;
     private Wacka.Task[] tasks;
     private int count;
 
     public TaskList() {
-        this.tasks = new Wacka.Task[100];
+        this.tasks = new Wacka.Task[TASK_CAPACITY];
         this.count = 0;
         assert this.count >= 0 && this.count <= this.tasks.length : "count must be in valid range after init";
     }
 
     public TaskList(Wacka.Task[] tasks) {
-        this.tasks = new Wacka.Task[100];
+        this.tasks = new Wacka.Task[TASK_CAPACITY];
         this.count = 0;
         if (tasks == null) {
             return;
         }
         for (Wacka.Task task : tasks) {
-            if (task == null || this.count >= 100) {
+            if (task == null || this.count >= TASK_CAPACITY) {
                 continue;
             }
             this.tasks[this.count] = task;
